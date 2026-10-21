@@ -2,8 +2,8 @@ name: Production Monitor
 
 on:
   schedule:
-    - cron: '0 * * * *' # Chạy tự động mỗi 1 giờ
-  workflow_dispatch: # Cho phép bấm chạy thủ công trên giao diện GitHub
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   monitor-api:
@@ -12,13 +12,13 @@ jobs:
       - name: Checkout mã nguồn
         uses: actions/checkout@v4
 
-      - name: Cài đặt Postman CLI
-        run: |
-          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+      - name: Cài đặt Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - name: Đăng nhập Postman
-        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Cài đặt công cụ Newman
+        run: npm install -g newman
 
-      - name: Chạy kịch bản Monitor trực tiếp từ Cloud
-        run: |
-          postman collection run "59952109-3875059a-b7ca-4ae5-8de3-d0d7a02970ec"
+      - name: Chạy Monitor tự động từ file cục bộ
+        run: newman run Production_Monitor_Demo.postman_collection.json
